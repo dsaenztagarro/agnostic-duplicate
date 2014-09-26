@@ -1,5 +1,7 @@
+[![Gem Version](https://badge.fury.io/rb/agnostic-duplicate.svg)](http://badge.fury.io/rb/agnostic-duplicate)
 [![Build Status](https://travis-ci.org/dsaenztagarro/agnostic-duplicate.png)](https://travis-ci.org/dsaenztagarro/agnostic-duplicate)
 [![Code Climate](https://codeclimate.com/github/dsaenztagarro/agnostic-duplicate/badges/gpa.svg)](https://codeclimate.com/github/dsaenztagarro/agnostic-duplicate)
+[![Test Coverage](https://codeclimate.com/github/dsaenztagarro/agnostic-duplicate/badges/coverage.svg)](https://codeclimate.com/github/dsaenztagarro/agnostic-duplicate)
 
 # Agnostic::Duplicate
 

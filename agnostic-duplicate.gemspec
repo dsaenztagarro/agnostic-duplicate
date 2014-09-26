@@ -28,8 +28,8 @@ desc
   spec.add_development_dependency 'rake'
   spec.add_development_dependency 'rspec'
   spec.add_development_dependency 'simplecov'
+  spec.add_development_dependency 'coveralls'
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'reek'
   spec.add_development_dependency 'cane'
-  spec.add_development_dependency 'codeclimate-test-reporter'
 end
