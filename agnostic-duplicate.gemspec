@@ -12,10 +12,10 @@ Gem::Specification.new do |spec|
 Duplicate library provides additional support for deep copy or shallow copy of
 specific fields in your models while you are `dupping` an instance.)
 summary
-  spec.description   = <<-description
+  spec.description   = <<-desc
 The advantage of using Duplicate module reside in support for fields that
 are not duplicated by default for any reason by calling `dup`.)
-description
+desc
   spec.homepage      = 'https://github.com/dsaenztagarro/agnostic-duplicate'
   spec.license       = 'MIT'
 
