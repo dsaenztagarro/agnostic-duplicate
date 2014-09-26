@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/dsaenztagarro/agnostic-duplicate.png)](https://travis-ci.org/dsaenztagarro/agnostic-duplicate)
+[![Code Climate](https://codeclimate.com/github/dsaenztagarro/agnostic-duplicate/badges/gpa.svg)](https://codeclimate.com/github/dsaenztagarro/agnostic-duplicate)
+
 # Agnostic::Duplicate
 
 Duplicate objects are provided with an additional method `duplicate` that
