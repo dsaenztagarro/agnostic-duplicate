@@ -213,7 +213,7 @@ describe Agnostic::Duplicate do
     end
     context 'when invalid settings' do
       context "when attribute doesn't exist" do
-        it 'raises an exception' do
+        it 'raises an attribute not found error' do
           expect do
             #:nodoc
             module DuplicateSpec
@@ -224,7 +224,47 @@ describe Agnostic::Duplicate do
               end
               InvalidAttributeTest.new.duplicate
             end
-          end.to raise_error("Invalid duplicable attribute 'name'")
+          end.to raise_error Agnostic::Duplicate::ChangeSet::AttributeNotFound
+        end
+      end
+      context 'when custom dup_template lacks of duplicable attribute' do
+        it 'raises a copy error on deep copy' do
+          expect do
+            #:nodoc
+            module DuplicateSpec
+              #:nodoc
+              class InvalidDupTemplateTest < Base
+                include Agnostic::Duplicate
+                attr_duplicable :name
+              end
+
+              obj = Object.new
+              obj.define_singleton_method('name=') do
+                fail 'Internal error'
+              end
+
+              InvalidDupTemplateTest.new.duplicate dup_template: obj
+            end
+          end.to raise_error Agnostic::Duplicate::ChangeSet::CopyError
+        end
+        it 'raises a copy error on shallow copy' do
+          expect do
+            #:nodoc
+            module DuplicateSpec
+              #:nodoc
+              class InvalidDupTemplateTest < Base
+                include Agnostic::Duplicate
+                attr_duplicable :name, strategy: :shallow_copy
+              end
+
+              obj = Object.new
+              obj.define_singleton_method('name=') do
+                fail 'Internal error'
+              end
+
+              InvalidDupTemplateTest.new.duplicate dup_template: obj
+            end
+          end.to raise_error Agnostic::Duplicate::ChangeSet::CopyError
         end
       end
       context 'when duplicable config is invalid' do

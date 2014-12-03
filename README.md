@@ -105,6 +105,23 @@ set this configuration through `duplicable_config` method:
  end
 ```
 
+If you want to apply the `duplicate` over a custom instance object instead
+of the default template for the current configuration, then you can pass a
+`dup_template` option on the method call
+
+```ruby
+otherobject  # => Object sharing duplicable attributes with 'myobject'
+myobject.duplicate dup_template: otherobject
+```
+
+As the object passed to dup_template should be compliant with the duplicable
+attribute list, if there is an error during the process an exception will
+be raise according to the type of error:
+
+  - Agnostic::Duplicate::ChangeSet::AttributeNotFound
+  - Agnostic::Duplicate::ChangeSet::CopyError
+
+
 ## Contributing
 
 1. Fork it ( https://github.com/dsaenztagarro/agnostic-duplicate/fork )

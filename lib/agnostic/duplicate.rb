@@ -84,6 +84,22 @@ module Agnostic
   #    # ...
   #  end
   # ```
+  #
+  # If you want to apply the `duplicate` over a custom instance object instead
+  # of the default template for the current configuration, then you can pass a
+  # `dup_template` option on the method call
+  #
+  # ```ruby
+  # otherobject  # => Object sharing duplicable attributes with 'myobject'
+  # myobject.duplicate dup_template: otherobject
+  # ```
+  #
+  # As the object passed to dup_template should be compliant with the duplicable
+  # attribute list, if there is an error during the process an exception will
+  # be raise according to the type of error:
+  #   - Agnostic::Duplicate::ChangeSet::AttributeNotFound
+  #   - Agnostic::Duplicate::ChangeSet::CopyError
+  #
   module Duplicate
     def self.included(base)
       base.extend(ClassMethods)
@@ -93,8 +109,11 @@ module Agnostic
 
     # Duplicates the object
     # @return [Duplicate] the new instance object
-    def duplicate
-      dup_template.tap do |model|
+    # @return opts [Hash] the options for duplicating
+    # @option [Object] dup_template The object over attributes are going to be
+    #   copied
+    def duplicate(opts = {})
+      (opts[:dup_template] || dup_template).tap do |model|
         apply_changesets!(model)
         hook_after_duplicate!(model) if respond_to? :hook_after_duplicate!
       end
@@ -113,12 +132,26 @@ module Agnostic
     # Contains all kinds of changesets that can be applied to a duplicable
     # object
     module ChangeSet
+      # Raised when there is an error while trying to copy an attribute
+      class CopyError < StandardError
+      end
+      # Raised when a non existing attribute is tried to be duplicated
+      class AttributeNotFound < StandardError
+      end
+
       # Base class for all changesets. Subclasses should implement method
       # `apply` (see #apply)
       class Base
         attr_reader :attributes
         def initialize(attributes)
           @attributes = attributes
+        end
+
+        private
+
+        def raise_copy_error_for(attribute)
+          msg = "It wasn't possible to copy attribute '#{attribute}'"
+          fail CopyError, msg, caller
         end
       end
 
@@ -130,16 +163,24 @@ module Agnostic
         # @param model [Duplicate] the duplicated new instance object
         def apply(parent, model)
           attributes.each do |attribute|
-            setter_method = "#{attribute}="
-            if model.respond_to?(setter_method)
-              model.send(setter_method, dup_attribute(parent, attribute))
-            else
-              fail "Invalid duplicable attribute '#{attribute}'"
+            unless model.respond_to? "#{attribute}="
+              fail AttributeNotFound, "Attribute: '#{attribute}'", caller
             end
+            deep_copy = dup_attribute(parent, attribute)
+            copy_attribute(attribute, model, deep_copy)
           end
         end
 
         private
+
+        # @param attribute [Symbol] attribute to be copied
+        # @param parent [Duplicable] the original object to be duplicated
+        # @param model [Duplicable] the duplicated new instance object
+        def copy_attribute(attribute, model, deep_copy)
+          model.send("#{attribute}=", deep_copy)
+        rescue
+          raise_copy_error_for(attribute)
+        end
 
         # @param parent [Duplicate] the original object to be duplicated
         # @param attribute [Symbol] the attribute to be duplicated
@@ -177,19 +218,30 @@ module Agnostic
       # of the primitive type.
       class ShallowCopy < Base
         # Applies changes needed on the duplicated new instance object
-        # @param parent [Duplicate] the original object to be duplicated
-        # @param model [Duplicate] the duplicated new instance object
+        # @param parent [Duplicable] the original object to be duplicated
+        # @param model [Duplicable] the duplicated new instance object
         def apply(parent, model)
           attributes.each do |attribute|
-            model.send("#{attribute}=", parent.send(attribute))
+            copy_attribute(attribute, parent, model)
           end
+        end
+
+        private
+
+        # @param attribute [Symbol] attribute to be copied
+        # @param parent [Duplicable] the original object to be duplicated
+        # @param model [Duplicable] the duplicated new instance object
+        def copy_attribute(attribute, parent, model)
+          model.send("#{attribute}=", parent.send(attribute))
+        rescue
+          raise_copy_error_for(attribute)
         end
       end
     end
 
     private
 
-    # @return [Duplicate] a new instance object based on global duplicable
+    # @return [Duplicable] a new instance object based on global duplicable
     #   configuration
     def dup_template
       klass = self.class
@@ -200,7 +252,7 @@ module Agnostic
       end
     end
 
-    # Methods added to classes including Duplicate module
+    # Methods added to classes including Duplicable module
     module ClassMethods
       attr_accessor :duplicable_changesets, :duplicable_options
 
@@ -220,15 +272,14 @@ module Agnostic
 
       # Sets global options for applying changesets
       #
-      # ## Options available:
-      # - `new_instance`: if `true` the duplicated instance is created calling
-      # in first place `new` method over the class. if `false` the duplicated
-      # instance is created calling to `dup` method over the instance object.
-      #
-      # @param options [Hash]
-      def duplicable_config(options)
-        if options.is_a? Hash
-          @duplicable_options.merge! options
+      # @param opts [Hash] The options for duplicable configuration
+      # @option opts [Boolean] :new_instance If `true` the duplicated instance
+      #   is created calling in first place `new` method over the class. if
+      #   `false` the duplicated instance is created calling to `dup` method
+      #   over the instance object.
+      def duplicable_config(opts)
+        if opts.is_a? Hash
+          @duplicable_options.merge! opts
           keep_valid_options
         else
           fail ArgumentError, 'Invalid options configuration'
