@@ -54,6 +54,11 @@ Example:
    has_many :properties, :images, :headlines
    # ...
  end
+ 
+ # Later in your code..
+
+ story # => Story instance
+ newstory = story.duplicate
 ```
 
 When using `duplicable` over any attribute, it verifies if the current value
@@ -118,8 +123,8 @@ As the object passed to dup_template should be compliant with the duplicable
 attribute list, if there is an error during the process an exception will
 be raise according to the type of error:
 
-  - Agnostic::Duplicate::ChangeSet::AttributeNotFound
-  - Agnostic::Duplicate::ChangeSet::CopyError
+  - `Agnostic::Duplicate::ChangeSet::AttributeNotFound`
+  - `Agnostic::Duplicate::ChangeSet::CopyError`
 
 
 ## Contributing
