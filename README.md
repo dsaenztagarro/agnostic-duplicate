@@ -3,6 +3,7 @@
 [![Code Climate](https://codeclimate.com/github/dsaenztagarro/agnostic-duplicate/badges/gpa.svg)](https://codeclimate.com/github/dsaenztagarro/agnostic-duplicate)
 [![Coverage Status](https://coveralls.io/repos/dsaenztagarro/agnostic-duplicate/badge.png?branch=master)](https://coveralls.io/r/dsaenztagarro/agnostic-duplicate?branch=master)
 [![Dependency Status](https://gemnasium.com/dsaenztagarro/agnostic-duplicate.svg)](https://gemnasium.com/dsaenztagarro/agnostic-duplicate)
+[![Inline docs](http://inch-ci.org/github/dsaenztagarro/agnostic-duplicate.svg?branch=master)](http://inch-ci.org/github/dsaenztagarro/agnostic-duplicate)
 
 # Agnostic::Duplicate
 
